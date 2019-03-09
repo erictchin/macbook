@@ -4,7 +4,7 @@
 # `brew install` packages for development
 ###############################################################################
 
-packages={
+packages=(
     awscli
     azure-cli
     docker-completion
@@ -16,7 +16,7 @@ packages={
     pyenv
     terraform
     vault
-}
+)
 
 cask=(
     docker
