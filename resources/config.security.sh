@@ -35,20 +35,20 @@ hardwareUUID=$(/usr/sbin/system_profiler SPHardwareDataType | grep "Hardware UUI
 ###############################################################################
 
 # Enable Auto Update for MacOS
-defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
 
 # Enable Auto Update for Apps from AppStore
-defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
-defaults write /Library/Preferences/com.apple.commerce AutoUpdateRestartRequired -bool true
+sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
+sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdateRestartRequired -bool true
 
 # Enable System Data Files and Security  Update Installs
-defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
-defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
 
 # Disable Bluetooth (if no paired device exists)
 connectable="$( system_profiler SPBluetoothDataType | grep Connectable | awk '{print $2}' | head -1 )"
 if [ "$connectable" = "Yes" ]; then
-    defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool false
+    sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool false
     killall -HUP blued
 fi
 
@@ -56,18 +56,18 @@ fi
 open "/System/Library/CoreServices/Menu Extras/Bluetooth.menu"
 
 # Set Time and Date Automatically
-systemsetup -setusingnetworktime on
+sudo systemsetup -setusingnetworktime on
 
 # Restrict NTP Server to Loopback Interface
 cp /etc/ntp-restrict.conf /etc/ntp-restrict_old.conf
 echo -n "restrict lo interface ignore wildcard interface listen lo" >> /etc/ntp-restrict.conf
 
 # Enable screensaver after 20 minutes of inactivity
-defaults write $CURRENT_USER_HOME/Library/Preferences/ByHost/com.apple.screensaver."$hardwareUUID".plist idleTime -int 1200
+sudo defaults write $CURRENT_USER_HOME/Library/Preferences/ByHost/com.apple.screensaver."$hardwareUUID".plist idleTime -int 1200
 
 
 # Disable Remote Apple Events
-systemsetup -setremoteappleevents off
+sudo systemsetup -setremoteappleevents off
 
 # Disable Internet Sharing
 /usr/libexec/PlistBuddy -c "Delete :NAT:AirPort:Enabled"  /Library/Preferences/SystemConfiguration/com.apple.nat.plist
@@ -78,7 +78,7 @@ systemsetup -setremoteappleevents off
 /usr/libexec/PlistBuddy -c "Add :NAT:PrimaryInterface:Enabled bool false" /Library/Preferences/SystemConfiguration/com.apple.nat.plist
 
 # Disable Screen Sharing and Remote Mangement
-/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop
 
 # Disable Print Sharing
 /usr/sbin/cupsctl --no-share-printers
@@ -91,25 +91,25 @@ systemsetup -f -setremotelogin off
 /usr/libexec/PlistBuddy -c "Add :PrefKeyServicesEnabled bool false" $CURRENT_USER_HOME/Library/Preferences/ByHost/com.apple.Bluetooth."$hardwareUUID".plist
 
 # Don't wake for network access
-pmset -a womp 0
+sudo pmset -a womp 0
 
 # Ensure Gatekeeper is enabled
-spctl --master-enable
+sudo spctl --master-enable
 
 # Enable Apple Firewall
-defaults write /Library/Preferences/com.apple.alf globalstate -int 2
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 2
 
 # Enable Apple Firewall Stealth Mode (don't respond to ping, etc)
-/usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 
 # Disable Bonjour Advertising Service
-defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
+sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist NoMulticastAdvertisements -bool YES
 
 # Show Wifi Status in menubar
 open "/System/Library/CoreServices/Menu Extras/AirPort.menu"
 
 # Disable NFS
-nfsd disable
+sudo nfsd disable
 
 # Restrict home directories
 IFS=$'\n'
@@ -133,44 +133,45 @@ done
 unset IFS
 
 # Enable OCSP and CRL certificate checking
-defaults write com.apple.security.revocation OCSPStyle -string RequireIfPresent
-defaults write com.apple.security.revocation CRLStyle -string RequireIfPresent
-defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.security.revocation OCSPStyle -string RequireIfPresent
-defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.security.revocation CRLStyle -string RequireIfPresent
+sudo defaults write com.apple.security.revocation OCSPStyle -string RequireIfPresent
+sudo defaults write com.apple.security.revocation CRLStyle -string RequireIfPresent
+sudo defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.security.revocation OCSPStyle -string RequireIfPresent
+sudo defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.security.revocation CRLStyle -string RequireIfPresent
 
 # Disable the `root` account
-dscl . -create /Users/root UserShell /usr/bin/false
+sudo dscl . -create /Users/root UserShell /usr/bin/false
 
 # Prompt for password when waking from sleep or screensaver
-defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.screensaver askForPassword -int 1
+sudo defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.screensaver askForPassword -int 1
 
 # Require admin password to access system-wide preferences
 security authorizationdb read system.preferences > /tmp/system.preferences.plist
 /usr/libexec/PlistBuddy -c "Set :shared false" /tmp/system.preferences.plist
-security authorizationdb write system.preferences < /tmp/system.preferences.plist
+sudo security authorizationdb write system.preferences < /tmp/system.preferences.plist
+rm /tmp/system.preferences.plist
 
 # Disable ability to login to another user's active and locked session
-/usr/bin/security authorizationdb write system.login.screensaver "use-login-window-ui"
+sudo security authorizationdb write system.login.screensaver "use-login-window-ui"
 
 # Disable fast user switching
-defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool false
+sudo defaults write /Library/Preferences/.GlobalPreferences MultipleSessionEnabled -bool false
 
 # Show login window as name and password (not prompted for with a username)
-defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool true
+sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool true
 
 # Disable guest account
-defaults write /Library/Preferences/com.apple.loginwindow.plist GuestEnabled -bool false
+sudo defaults write /Library/Preferences/com.apple.loginwindow.plist GuestEnabled -bool false
 
 # Disable allow guests to connect to shared folders
-defaults write /Library/Preferences/com.apple.AppleFileServer guestAccess -bool no
-defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server AllowGuestAccess -bool no
+sudo defaults write /Library/Preferences/com.apple.AppleFileServer guestAccess -bool no
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server AllowGuestAccess -bool no
 
 # Remove guest home folder
-rm -rf /Users/Guest
+sudo rm -rf /Users/Guest || true
 
 # disable automatic run of safe files in Safari
-defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.Safari AutoOpenSafeDownloads -bool false
+sudo defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.Safari AutoOpenSafeDownloads -bool false
 
 # reduce sudo timeout period
-echo "Defaults timestamp_timeout=0" >> /etc/sudoers
+sudo echo "Defaults timestamp_timeout=0" >> /etc/sudoers
 
