@@ -84,7 +84,7 @@ sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resourc
 /usr/sbin/cupsctl --no-share-printers
 
 # Disable Remote Login
-systemsetup -f -setremotelogin off
+sudo systemsetup -f -setremotelogin off
 
 # Disable Bluetooth Sharing
 /usr/libexec/PlistBuddy -c "Delete :PrefKeyServicesEnabled" $CURRENT_USER_HOME/Library/Preferences/ByHost/com.apple.Bluetooth."$hardwareUUID".plist
