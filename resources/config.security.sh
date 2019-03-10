@@ -60,7 +60,7 @@ sudo systemsetup -setusingnetworktime on
 
 # Restrict NTP Server to Loopback Interface
 cp /etc/ntp-restrict.conf /etc/ntp-restrict_old.conf
-echo -n "restrict lo interface ignore wildcard interface listen lo" >> /etc/ntp-restrict.conf
+sudo echo -n "restrict lo interface ignore wildcard interface listen lo" >> /etc/ntp-restrict.conf
 
 # Enable screensaver after 20 minutes of inactivity
 sudo defaults write $CURRENT_USER_HOME/Library/Preferences/ByHost/com.apple.screensaver."$hardwareUUID".plist idleTime -int 1200
@@ -127,8 +127,8 @@ unset IFS
 
 # Check for world writeable files in /System
 IFS=$'\n'
-for sysPermissions in $( find /System -type d -perm -2 | grep -v "Public/Drop Box" ); do
-    chmod -R o-w "$sysPermissions"
+for sysPermissions in $( sudo find /System -type d -perm -2 | grep -v "Public/Drop Box" ); do
+    sudo chmod -R o-w "$sysPermissions"
 done
 unset IFS
 
@@ -145,7 +145,7 @@ sudo dscl . -create /Users/root UserShell /usr/bin/false
 sudo defaults write $CURRENT_USER_HOME/Library/Preferences/com.apple.screensaver askForPassword -int 1
 
 # Require admin password to access system-wide preferences
-security authorizationdb read system.preferences > /tmp/system.preferences.plist
+sudo security authorizationdb read system.preferences > /tmp/system.preferences.plist
 /usr/libexec/PlistBuddy -c "Set :shared false" /tmp/system.preferences.plist
 sudo security authorizationdb write system.preferences < /tmp/system.preferences.plist
 rm /tmp/system.preferences.plist
