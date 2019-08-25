@@ -6,6 +6,7 @@
 
 packages=(
     joplin
+    pass
 )
 
 cask=(
