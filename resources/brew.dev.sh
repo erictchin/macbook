@@ -7,28 +7,25 @@
 packages=(
     awscli
     azure-cli
+    b2-tools
     docker-completion
     docker-machine-completion
     docker-compose-completion
+    helmfile
     kubectl
+    kubectx
     kubernetes-helm
-    pipenv
     pyenv
-    terraform
-    vault
+    pipenv
+    tfenv
 )
 
 cask=(
     docker
-    google-cloud-sdk
     iterm2
-    # jetbrains-toolbox
     minikube
-    vagrant
-    vagrant-manager
     virtualbox
     visual-studio-code
-    xquartz
 )
 
 # Install the packages defined in `packages`

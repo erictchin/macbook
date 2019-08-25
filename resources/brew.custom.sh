@@ -5,6 +5,7 @@
 ###############################################################################
 
 packages=(
+    joplin
 )
 
 cask=(
@@ -12,10 +13,8 @@ cask=(
     calibre
     dozer
     gas-mask
-    iterm2
     spectacle
     spotify
-    the-unarchiver
     vlc
 )
 
